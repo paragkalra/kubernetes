@@ -1,22 +1,61 @@
+# ==========================================
+# THE FOUNDATION (API & Metadata)
+# ==========================================
+# Tells the Kubernetes API server which group and version to use.
 apiVersion: apps/v1
+
+# Defines the specific Kubernetes object you are creating.
 kind: ReplicaSet
+
+# This is data about the ReplicaSet ITSELF.
 metadata:
+  # The unique identifier. This is what shows up when you run `kubectl get rs`.
   name: myapp-rs
+
+  # BLOCK 1 - THE RS TAGS
+  # Sticky notes placed directly on the ReplicaSet object.
+  # These are used to organize or select the ReplicaSet itself (e.g., `kubectl get rs -l app=myapp`).
+  # These labels DO NOT affect the Pods.
   labels:
     app: myapp
     type: front-end
+
+# ==========================================
+# THE SPECIFICATION (Desired State)
+# ==========================================
+# This defines the exact state you want Kubernetes to maintain.
 spec:
+  # You are demanding that exactly 3 Pods matching your criteria are running at all times.
   replicas: 3
+
+  # BLOCK 2 - THE RADAR
+  # The ReplicaSet's tracking system. It tells the controller to look across
+  # the namespace for ANY Pods that possess these exact labels.
+  # If it counts fewer than 3, it creates more. If it counts more than 3, it terminates the extras.
   selector:
     matchLabels:
       app: myapp
       type: front-end
+
+  # ==========================================
+  # THE TEMPLATE (The Pod Blueprint)
+  # ==========================================
+  # If the radar (selector) notices missing Pods, it uses this blueprint to build new ones.
   template:
     metadata:
+      # BLOCK 3 - THE STAMP
+      # When the ReplicaSet creates a brand new Pod, it stamps these exact labels onto it.
+      # GOLDEN RULE: These labels MUST match the 'matchLabels' in Block 2!
+      # If they don't, the ReplicaSet will never "see" the Pods it just created,
+      # resulting in an infinite loop of creating new Pods.
       labels:
         app: myapp
         type: front-end
+
+    # The actual container definition for the newly minted Pods.
     spec:
       containers:
+        # The name given to the running container inside the Pod.
         - name: nginx-container
+          # The specific image pulled from the container registry to run.
           image: nginx:latest

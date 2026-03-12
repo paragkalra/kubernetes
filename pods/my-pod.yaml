@@ -1,8 +1,41 @@
+# ==========================================
+# THE FOUNDATION (API & Kind)
+# ==========================================
+# 'v1' is the core Kubernetes API group. It contains the most fundamental
+# and stable objects in the ecosystem.
 apiVersion: v1
+
+# Defines the specific Kubernetes object you are creating.
+# A Pod is the smallest, most basic deployable computing unit in Kubernetes.
+# Think of it as a logical "wrapper" around one or more containers.
 kind: Pod
+
+# ==========================================
+# THE METADATA (Identification)
+# ==========================================
+# This section provides the data that uniquely identifies the object
+# within the cluster.
 metadata:
+  # The unique identifier for this specific Pod.
+  # When you run `kubectl get pods`, this is the name that will appear.
   name: my-pod
+
+# ==========================================
+# THE SPECIFICATION (Desired State)
+# ==========================================
+# The 'spec' block defines the actual blueprint of the Pod.
+# It tells the Kubernetes node (kubelet) exactly what needs to run inside.
 spec:
+  # A Pod can hold one or more containers that share the same network and storage.
+  # This section lists all the containers that belong inside this Pod.
   containers:
+    # The name assigned to this specific container inside the Pod.
+    # This becomes very important if you have multiple containers in one Pod
+    # and need to check logs: `kubectl logs my-pod -c my-container`
     - name: my-container
+
+      # The exact container image to pull and run.
+      # Because no specific registry (like gcr.io or quay.io) is provided,
+      # the cluster will default to pulling this from Docker Hub.
+      # The ':latest' tag means it will pull the most recently updated version of nginx.
       image: nginx:latest
