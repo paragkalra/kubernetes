@@ -1,21 +1,69 @@
+# ==========================================
+# THE FOUNDATION (API & Kind)
+# ==========================================
+# Like ReplicaSets, Deployments use the apps/v1 API group.
 apiVersion: apps/v1
+
+# This is the crucial difference. By declaring a Deployment,
+# Kubernetes knows to enable version control, rollouts, and rollbacks.
+
+# ========================================================================
+# DEPLOYMENT VS. REPLICASET
+# Structurally, their YAMLs are identical except for the 'kind' field.
+# Behaviorally, they serve completely different purposes:
+#
+# REPLICASET (The Bodyguard):
+# - Purpose: Strictly maintains 'x' number of running pods.
+# - Updates: Manual. Changing the YAML image does NOT update live pods.
+#   You must explicitly delete old pods to force a recreation.
+#
+# DEPLOYMENT (The Manager):
+# - Purpose: Manages ReplicaSets to handle application lifecycles.
+# - Updates: Automated. Changing the image triggers a Rolling Update
+#   (zero downtime) by gradually spinning up a new ReplicaSet and
+#   scaling down the old one.
+# - Rollbacks: Enables instant reversion to previous versions.
+# ========================================================================
 kind: Deployment
+
+# This is the metadata for the Deployment object itself.
 metadata:
   name: myapp-deployment
   labels:
     app: myapp
     type: front-end
+
+# ==========================================
+# THE SPECIFICATION (Desired State)
+# ==========================================
 spec:
+  # The Deployment will instruct its underlying ReplicaSet to maintain 3 Pods.
   replicas: 3
+
+  # THE RADAR: The Deployment looks for Pods with this label.
+  # Note: You only specified `type: front-end` here, which is perfectly valid
+  # as long as the generated pods possess this label (which they do below).
   selector:
     matchLabels:
       type: front-end
+
+  # ==========================================
+  # THE TEMPLATE (The Pod Blueprint)
+  # ==========================================
   template:
     metadata:
+      # IMPORTANT LEARNING NOTE:
+      # While you put `name: myapp-pod` here, the Deployment controller will actually IGNORE it.
+      # Because the controller needs to spin up multiple unique pods, it auto-generates
+      # the names based on the Deployment name + a hash (e.g., myapp-deployment-6b5f9-z8a1).
       name: myapp-pod
+
+      # THE STAMP: These labels are attached to the newly created Pods.
+      # The `type: front-end` label matches the selector above, so the Deployment can track it.
       labels:
         app: myapp
         type: front-end
+
     spec:
       containers:
         - name: nginx-container

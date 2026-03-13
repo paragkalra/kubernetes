@@ -5,6 +5,23 @@
 apiVersion: apps/v1
 
 # Defines the specific Kubernetes object you are creating.
+# ========================================================================
+# DEPLOYMENT VS. REPLICASET
+# Structurally, their YAMLs are identical except for the 'kind' field.
+# Behaviorally, they serve completely different purposes:
+#
+# REPLICASET (The Bodyguard):
+# - Purpose: Strictly maintains 'x' number of running pods.
+# - Updates: Manual. Changing the YAML image does NOT update live pods.
+#   You must explicitly delete old pods to force a recreation.
+#
+# DEPLOYMENT (The Manager):
+# - Purpose: Manages ReplicaSets to handle application lifecycles.
+# - Updates: Automated. Changing the image triggers a Rolling Update
+#   (zero downtime) by gradually spinning up a new ReplicaSet and
+#   scaling down the old one.
+# - Rollbacks: Enables instant reversion to previous versions.
+# ========================================================================
 kind: ReplicaSet
 
 # This is data about the ReplicaSet ITSELF.
