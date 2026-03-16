@@ -1,11 +1,44 @@
+# ==========================================
+# THE FOUNDATION (API & Kind)
+# ==========================================
+# 'v1' is the core Kubernetes API group for foundational networking objects.
 apiVersion: v1
+
+# A Service provides a single, stable IP address and DNS name
+# for a dynamic group of underlying Pods.
 kind: Service
+
+# ==========================================
+# THE METADATA (Identification)
+# ==========================================
 metadata:
+  # This name is critical. It becomes the internal DNS record for the cluster.
+  # Other Pods can reach this service simply by communicating with
+  # 'http://myapp-clusterip-service'
   name: myapp-clusterip-service
+
+# ==========================================
+# THE SPECIFICATION (Routing Rules)
+# ==========================================
 spec:
+  # DEFAULT BEHAVIOR NOTE:
+  # Because there is no 'type:' field explicitly defined here,
+  # Kubernetes defaults this to 'type: ClusterIP'.
+  # This means the service is ONLY accessible from within the cluster.
+
+  # THE TARGET: How the Service finds the Pods.
+  # The Service will route incoming traffic to any Pod in the same namespace
+  # that possesses BOTH of these exact labels.
   selector:
     app: myapp
     type: front-end
+
+  # THE PORTS: How the traffic is mapped.
   ports:
+    # The port that the Service itself exposes to the rest of the cluster.
+    # Other internal applications will send traffic to this port.
     - port: 80
+
+      # The port that the actual container is listening on inside the Pod.
+      # The Service takes traffic from 'port' and forwards it to this 'targetPort'.
       targetPort: 80

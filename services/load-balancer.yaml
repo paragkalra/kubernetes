@@ -1,10 +1,55 @@
+# ==========================================
+# THE FOUNDATION (API & Kind)
+# ==========================================
+# 'v1' is the core Kubernetes API group for foundational networking.
 apiVersion: v1
+
+# This object acts as a stable network endpoint for external or internal traffic.
 kind: Service
+
+# ==========================================
+# THE METADATA (Identification)
+# ==========================================
 metadata:
+  # The identifier for the Service.
   name: myapp-loadbalancer-service
+
+# ==========================================
+# THE SPECIFICATION (Routing Rules & Type)
+# ==========================================
 spec:
+  # THE TYPE: LoadBalancer
+  # This tells your cloud provider (like GCP or AWS) to automatically
+  # provision a physical or software Load Balancer in your cloud account.
+  # This external LB will receive a public IP address and route web traffic
+  # directly into your cluster.
   type: LoadBalancer
+
+  # ==========================================
+  # THE SELECTOR (The Added Field)
+  # ==========================================
+  # This is the radar for the Service. It continuously scans the namespace
+  # and automatically routes incoming traffic to any Pods that possess
+  # BOTH of these exact labels.
+  selector:
+    app: myapp
+    type: front-end
+
+  # THE PORTS: The complete traffic flow mapping.
+  # Traffic flows: External LB -> NodePort -> Service Port -> TargetPort
   ports:
+    # 1. THE TARGET PORT:
+    # The port that your actual application container is listening on
+    # inside the Pod.
     - targetPort: 80
+
+      # 2. THE SERVICE PORT:
+      # The internal port that this Service is listening on.
+      # Other Pods inside the cluster can use this port to connect.
       port: 80
+
+      # 3. THE NODE PORT:
+      # A static port opened on the IP address of EVERY worker node in the cluster.
+      # The external cloud load balancer sends its traffic to this specific port.
+      # It must always fall within the 30000-32767 range.
       nodePort: 30009

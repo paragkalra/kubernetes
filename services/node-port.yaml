@@ -1,13 +1,56 @@
+# ========================================================================
+# THE FOUNDATION (API & Kind)
+# ========================================================================
+# 'v1' is the core Kubernetes API group for foundational networking objects.
 apiVersion: v1
+
+# A Service provides stable network connectivity to a dynamic set of Pods.
 kind: Service
+
+# ========================================================================
+# THE METADATA (Identification)
+# ========================================================================
 metadata:
+  # The unique name of the Service. This also becomes the internal
+  # DNS name for the service within the cluster.
   name: myapp-service
+
+# ========================================================================
+# THE SPECIFICATION (Routing Rules & Type)
+# ========================================================================
 spec:
+  # THE TYPE: NodePort
+  # This exposes the Service on each worker Node's IP at a static port.
+  # It allows external traffic to reach the cluster by hitting <NodeIP>:<NodePort>.
   type: NodePort
+
+  # THE SELECTOR: The radar for the Service.
+  # It continuously scans the namespace and automatically routes incoming
+  # traffic to any Pods that possess BOTH of these exact labels.
   selector:
     app: myapp
     type: front-end
+
+  # THE PORTS: The complete traffic flow mapping.
+  # Traffic flows: External User -> Node IP:NodePort -> Service Port -> TargetPort
   ports:
-    - port: 80
+    # THE PROTOCOL (The Added Field):
+    # Explicitly defining the protocol (TCP, UDP, or SCTP) is a best practice
+    # for security auditing and readability, even though TCP is the default.
+    - protocol: TCP
+
+      # 1. THE SERVICE PORT (port):
+      # The internal port that this Service is listening on.
+      # Other Pods inside the cluster can use this port to connect.
+      port: 80
+
+      # 2. THE TARGET PORT (targetPort):
+      # The port that your actual application container is listening on
+      # inside the Pod.
       targetPort: 80
+
+      # 3. THE NODE PORT (nodePort):
+      # A static port opened on the external IP address of EVERY worker node.
+      # External users will access the app using http://<Node-IP>:30008.
+      # It must always fall within the 30000-32767 range.
       nodePort: 30008
