@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Binding
+metadata:
+  # This MUST exactly match the name of the pending Pod you want to schedule.
+  name: nginx-pod
+target:
+  # The target specifies the destination for the Binding.
+  apiVersion: v1
+  kind: Node
+  # This instructs the API server to assign the pod to this specific worker node.
+  # This maps perfectly to the worker node currently running in your local virtualized cluster.
+  name: node01
