@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
+  # The name of the pod must match the metadata.name in the Binding object.
   name: nginx-pod
 spec:
   containers:
@@ -8,4 +9,6 @@ spec:
       image: nginx:latest
       ports:
         - containerPort: 8080
+  # Leaving nodeName completely blank (or omitting it entirely) ensures the
+  # Pod will remain in a 'Pending' state if there is no active scheduler.
   nodeName:
