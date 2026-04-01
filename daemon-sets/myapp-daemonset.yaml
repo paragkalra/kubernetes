@@ -1,22 +1,60 @@
+# apiVersion specifies the version of the Kubernetes API to use. DaemonSets
+# belong to the "apps" API group, version "v1".
 apiVersion: apps/v1
+
+# kind specifies what kind of object you want to create. A DaemonSet ensures
+# that all (or some) Nodes run a copy of a Pod.
 kind: DaemonSet
+
+# metadata helps uniquely identify the DaemonSet object itself.
 metadata:
+  # name is the unique identifier for this DaemonSet within its namespace.
   name: myapp-daemonset
+
+  # These labels (under metadata.labels) are attached directly to the DaemonSet
+  # object itself. They are useful for organizing and querying DaemonSet
+  # objects using kubectl. They do not affect the Pods managed by the
+  # DaemonSet.
   labels:
     app: myapp
     type: front-end
+
+# spec defines the desired state of the DaemonSet, including how it should find
+# and create Pods.
 spec:
+  # The selector determines how the DaemonSet finds the Pods it is supposed to
+  # manage. It must match the labels defined in the pod template below.
   selector:
+    # matchLabels (under spec.selector.matchLabels) defines the exact labels
+    # that a Pod must have to be considered managed by this DaemonSet. It tells
+    # the DaemonSet controller which Pods to look for and control.
     matchLabels:
       app: myapp
       type: front-end
+
+  # template is the blueprint used to create new Pods when necessary (e.g.
+  # when a new Node joins the cluster).
   template:
+    # metadata here is explicitly for the Pods that will be created, not for
+    # the DaemonSet object.
     metadata:
+      # name for the Pod template (optional, generated names will be used if
+      # this is omitted).
       name: myapp-pod
+
+      # These labels (under spec.template.metadata.labels) are attached to the
+      # actual Pods created by this DaemonSet. They MUST match the matchLabels
+      # specified above in the selector.
       labels:
         app: myapp
         type: front-end
+
+    # spec here defines the actual contents of the Pods (e.g. containers).
     spec:
+      # containers is a list of containers to run inside the Pod.
       containers:
+        # name is the identifier for this specific container within the Pod.
         - name: nginx-container
+
+          # image is the Docker container image to run for this container.
           image: nginx:latest
