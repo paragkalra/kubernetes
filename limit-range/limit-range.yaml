@@ -1,0 +1,62 @@
+# apiVersion specifies which version of the Kubernetes API you're using to
+# create this object.
+apiVersion: v1
+
+# kind specifies what kind of object you want to create (LimitRange in this
+# case).
+# LimitRange is a policy to constrain resource allocations (to limits and
+# requests) that you can specify for each object kind (such as Pod or
+# Container) in a namespace.
+kind: LimitRange
+
+# metadata helps uniquely identify the object, including a name string and
+# optionally a namespace.
+metadata:
+  # name is the unique identifier for this LimitRange within its namespace.
+  name: cpu-limit-range
+
+# spec defines the desired state or behavior of the LimitRange.
+spec:
+  # limits defines a list of limits and requests for different types of
+  # resources.
+  limits:
+    # type specifies the kind of resource to which the limits apply. Here, it
+    # applies to each individual Container.
+    - type: Container
+      
+      # max defines the maximum compute resources that a container can request
+      # or be limited to.
+      # If a container in the namespace requests more than this or sets a limit
+      # higher than this, its creation will be rejected.
+      max:
+        # Maximum CPU limit. "500m" means 500 millicores (0.5 CPU).
+        cpu: "500m"
+        # Maximum memory limit. "512Mi" means 512 Mebibytes.
+        memory: "512Mi"
+      
+      # min defines the minimum compute resources that a container must request
+      # or be limited to.
+      # If a container specifies a request or limit below this value, its
+      # creation will be rejected.
+      min:
+        # Minimum CPU request/limit. "100m" means 100 millicores (0.1 CPU).
+        cpu: "100m"
+        # Minimum memory request/limit. "128Mi" means 128 Mebibytes.
+        memory: "128Mi"
+      
+      # default is the default resource limit applied to a container if it
+      # doesn't specify its own resource limits.
+      default:
+        # Default CPU limit applied if not specified by the container.
+        cpu: "200m"
+        # Default memory limit applied if not specified by the container.
+        memory: "256Mi"
+      
+      # defaultRequest is the default resource request applied to a container
+      # if it doesn't specify its own resource requests.
+      defaultRequest:
+        # Default CPU request applied if not specified by the container.
+        cpu: "100m"
+        # Default memory request applied if not specified by the container.
+        memory: "128Mi"
+
